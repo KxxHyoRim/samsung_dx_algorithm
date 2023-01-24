@@ -1,9 +1,5 @@
 #define MAX_NODE 10000
 
-#include<iostream>
-
-using namespace std;
-
 struct Node {
     int data;
     Node *next;
@@ -21,6 +17,7 @@ Node *getNode(int data) {
 }
 
 void init() {
+    cnt = 0;
     nodeCnt = 0;
     head = getNode(-1);
 }
@@ -58,11 +55,9 @@ void removeNode(int data) {
     while (n-> next->data != data) {
         n = n->next;
         if ( n->next == nullptr) {
-            cout << "지울 값 없음" << endl;
             return; // 값 없음
         }
     }
-    cout << "cur : " <<  n->data << endl;
     n->next = n->next->next;
     cnt--;
 }
