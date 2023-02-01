@@ -4,7 +4,7 @@
 
 using namespace std;
 
-int TC, n, core, wire;
+int TC, n, core, wire, cantConnect;
 int map[12][12];
 vector<pair<int, int>> v;
 int dx[4] = {0, 0, -1, 1};
@@ -14,6 +14,7 @@ void resetGlobalVar() {
     core = 0;
     wire = INT_MAX;
     v.clear();
+    cantConnect = 0;
 }
 
 bool isEdge(int x, int y) {
@@ -47,12 +48,13 @@ void dfs(int idx, int connectN, int wireLen) {
                 map[y][x] = 2;
                 temp_wire++;
             }
-        }
+        } else { cantConnect++; }
 
         int currCore = (canConnect) ? connectN + 1 : connectN;
         int currWire = wireLen + temp_wire;
 
         if (idx < v.size() - 1) {
+            if (canConnect > core) return;
             dfs(idx + 1, currCore, currWire);
         } else {    // 마지막 노드
             // cout << core << " " << wire << endl;
