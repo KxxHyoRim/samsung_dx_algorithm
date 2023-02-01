@@ -48,13 +48,16 @@ void dfs(int idx, int connectN, int wireLen) {
                 map[y][x] = 2;
                 temp_wire++;
             }
-        } else { cantConnect++; }
+        }
 
         int currCore = (canConnect) ? connectN + 1 : connectN;
         int currWire = wireLen + temp_wire;
 
         if (idx < v.size() - 1) {
-            if (canConnect > core) return;
+            // !중요!
+            // 남은 core를 다 연결한다 해도
+            // 현재까지 구해둔 core의 최대개수를 넘지 못하면 재귀호출x (backtracking)
+            if (core > currCore + v.size() - idx) return;
             dfs(idx + 1, currCore, currWire);
         } else {    // 마지막 노드
             // cout << core << " " << wire << endl;
