@@ -3,7 +3,6 @@
 #include <queue>
 
 #define MINE 99999
-
 #define check (-1)
 
 using namespace std;
@@ -16,18 +15,6 @@ int dy[8] = {1, -1, 0, 0, -1, -1, 1, 1};
 int N;
 int click;
 int notVisit;
-
-void printMap() {
-
-    for (int y = 0; y < N; y++) {
-        for (int x = 0; x < N; x++) {
-            if (map[y][x] == MINE)
-                cout << "* ";
-            else cout << map[y][x] << " ";
-        }
-        cout << endl;
-    }
-}
 
 bool isInMap(int x, int y);
 
@@ -48,7 +35,6 @@ int main() {
     string oneLine;
     cin >> T;
     for (int tc = 1; tc <= T; ++tc) {
-        // 입력받고 초기화
         init();
         cin >> N;
         for (int y = 0; y < N; y++) {
@@ -90,22 +76,19 @@ void bfs(int x, int y) {
     while (!q.empty()) {
         x = q.front().first;
         y = q.front().second;
-        //cout << "(" << x << "," << y << ") 방문중 : \n";
         q.pop();
 
         for (int i = 0; i < 8; i++) {
             int nx = x + dx[i];
             int ny = y + dy[i];
             if (!isInMap(nx, ny)) continue;
-            //cout << "\t" << "(" << nx << "," << ny << ") : " << map[ny][nx] << endl; ;
             if (map[ny][nx] == 0) {
                 q.emplace(nx, ny);
                 map[ny][nx] = -1;
                 notVisit--;
-            } else if (map[ny][nx] != check && map[ny][nx] != MINE) { // 아직 방문 전이라면
+            } else if (map[ny][nx] != check && map[ny][nx] != MINE) {
+                // 방문하지 않았음, but 근처에 상수가 있는 위치
                 notVisit--;
-            } else if (map[ny][nx] == MINE) {
-                //cout << "* 이건 안나오는게 맞음 " << endl;
             }
             map[ny][nx] = check;
         }
