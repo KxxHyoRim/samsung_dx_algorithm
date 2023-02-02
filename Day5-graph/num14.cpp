@@ -1,7 +1,8 @@
 #include <iostream>
 #include <cstring>
-#include <climits>
 #include <queue>
+
+#define MINE 99999
 
 #define check (-1)
 
@@ -16,21 +17,24 @@ int N;
 int click;
 int notVisit;
 
-void printMap(){
+void printMap() {
 
-    for(int y = 0 ; y < N; y++){
-        for(int x = 0 ; x < N; x++){
-            if (map[y][x] == INT_MAX)
+    for (int y = 0; y < N; y++) {
+        for (int x = 0; x < N; x++) {
+            if (map[y][x] == MINE)
                 cout << "* ";
-            else cout << map[y][x] << " " ;
+            else cout << map[y][x] << " ";
         }
         cout << endl;
     }
 }
 
 bool isInMap(int x, int y);
-bool getMineNum(int x, int y);
+
+int getMineNum(int x, int y);
+
 void bfs(int x, int y);
+
 void init();
 
 int main() {
@@ -40,33 +44,28 @@ int main() {
 
     freopen("num14.txt", "r", stdin);
 
-
     int T;
     string oneLine;
     cin >> T;
     for (int tc = 1; tc <= T; ++tc) {
+        // 입력받고 초기화
         init();
         cin >> N;
         for (int y = 0; y < N; y++) {
             cin >> oneLine;
             for (int x = 0; x < N; x++) {
-                if (oneLine[x] == '*') {
-                    map[y][x] = INT_MAX;
-                } else { // '.'인 경우
-                    notVisit += 1;
-                }
+                if (oneLine[x] == '*') { map[y][x] = MINE; }
+                else { notVisit += 1; }
             }
         }
 
         // 근처 지뢰수 초기화
         for (int y = 0; y < N; y++) {
             for (int x = 0; x < N; x++) {
-                if (map[y][x] == INT_MAX) continue;
+                if (map[y][x] == MINE) continue;
                 map[y][x] = getMineNum(x, y);
             }
         }
-
-//        printMap();
 
         for (int y = 0; y < N; y++) {
             for (int x = 0; x < N; x++) {
@@ -77,8 +76,6 @@ int main() {
             }
         }
 
-//        printMap();
-
         cout << "#" << tc << " " << click + notVisit << "\n";
     }
     return 0;
@@ -87,26 +84,30 @@ int main() {
 
 void bfs(int x, int y) {
     q.emplace(x, y);
+    map[y][x] = -1;
     notVisit--;
 
     while (!q.empty()) {
         x = q.front().first;
         y = q.front().second;
-        map[y][x] = -1;
+        //cout << "(" << x << "," << y << ") 방문중 : \n";
         q.pop();
 
         for (int i = 0; i < 8; i++) {
             int nx = x + dx[i];
             int ny = y + dy[i];
-            if (isInMap(nx, ny)) {
-                if (map[ny][nx] == 0) {
-                    q.emplace(ny, nx);
-                    notVisit--;
-                } else if (map[ny][nx] != check && map[ny][nx] != INT_MAX) { // 아직 방문 전이라면
-                    notVisit--;
-                }
-                map[ny][nx] = check;
+            if (!isInMap(nx, ny)) continue;
+            //cout << "\t" << "(" << nx << "," << ny << ") : " << map[ny][nx] << endl; ;
+            if (map[ny][nx] == 0) {
+                q.emplace(nx, ny);
+                map[ny][nx] = -1;
+                notVisit--;
+            } else if (map[ny][nx] != check && map[ny][nx] != MINE) { // 아직 방문 전이라면
+                notVisit--;
+            } else if (map[ny][nx] == MINE) {
+                //cout << "* 이건 안나오는게 맞음 " << endl;
             }
+            map[ny][nx] = check;
         }
     }
 }
@@ -120,17 +121,16 @@ void init() {
 }
 
 
-bool getMineNum(int x, int y) {
+int getMineNum(int x, int y) {
     int mine = 0;
     for (int i = 0; i < 8; i++) {
         int nx = x + dx[i];
         int ny = y + dy[i];
         if (!isInMap(nx, ny)) continue;
-        if (map[ny][nx] == INT_MAX) mine++;
+        if (map[ny][nx] == MINE) mine++;
     }
     return mine;
 }
-
 
 
 bool isInMap(int x, int y) {
