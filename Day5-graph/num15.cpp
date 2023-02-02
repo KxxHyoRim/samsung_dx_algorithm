@@ -1,7 +1,6 @@
 #include <iostream>
 #include <list>
 #include <queue>
-#include <cstring>
 
 using namespace std;
 
@@ -29,6 +28,8 @@ int main() {
     for (int tc = 1; tc <= TC; tc++) {
         ll->clear();
         visited.clear();
+        fill(depth, depth+n, 0);
+        fill(parent, parent+n, 0);
 
         depth[1] = 0;
         cin >> n;
@@ -83,7 +84,8 @@ int realBFS() {
 }
 
 int sp(int from, int to) {
-    // cout << "from/to : " << from << ", " << to << " ";
+    // todo : sp 배열을 저장해놓고 꺼내쓰기!!
+    //  -> memorization 통해서 시간복잡도 줄이기
     int count = 1;
     int depthFrom = depth[from];
     int depthTo = depth[to];
