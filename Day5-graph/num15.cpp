@@ -2,20 +2,23 @@
 #include <list>
 #include <queue>
 
+#define ll long long
+
 using namespace std;
 
-list<int> ll[100000];
+int TC, N, parentIdx;
+list<int> pList[100000];
 list<int> visited;
 int depth[100000];
-int parent[100000];
+int parent[100000][21];
 
-void bfs();
+ll bfs();
 
-int realBFS();
-
-int sp(int from, int to);
+int LCA(int from, int to);
 
 void dfs(int, int);
+
+void setParent();
 
 int main() {
     ios_base::sync_with_stdio(false);
@@ -23,92 +26,79 @@ int main() {
     cout.tie(NULL);
     freopen("num15.txt", "r", stdin);
 
-    int TC, n, parentIdx;
     cin >> TC;
     for (int tc = 1; tc <= TC; tc++) {
-        ll->clear();
+        pList->clear();
         visited.clear();
-        fill(depth, depth+n, 0);
-        fill(parent, parent+n, 0);
+        fill(depth, depth + N, 0);
+        memset(parent, 0, sizeof(parent));
 
         depth[1] = 0;
-        cin >> n;
-        for (int i = 2; i < n + 1; i++) {
+        cin >> N;
+        for (int i = 2; i < N + 1; i++) {
             cin >> parentIdx;
-            parent[i] = parentIdx;
+            parent[i][0] = parentIdx;
             depth[i] = depth[parentIdx] + 1;
-            ll[parentIdx].push_back(i);
+            pList[parentIdx].push_back(i);
         }
 
-        bfs(); // 방문순서
-        // 최단경로 찾기 (LCA활용하기)
-
-        cout << "#" << tc << " " << realBFS() << "\n";
+        setParent();
+        cout << "#" << tc << " " << bfs() << "\n";
     }
     return 0;
 }
 
-void bfs() {
+ll bfs() {
+    long long move = 0;
     int n = 1;
+    int from = n;
     queue<int> q;
     q.emplace(n);
     visited.push_back(n);
     int tempDepth = 0;
     while (!q.empty()) {
         n = q.front();
+        int to = n;
+        int lca = LCA(from, to);
+        move += depth[from] + depth[to] - 2 * depth[lca];
         q.pop();
         tempDepth++;
-        while (!ll[n].empty()) {
-            int child = ll[n].front();
-            ll[n].pop_front();
+        while (!pList[n].empty()) {
+            int child = pList[n].front();
+            pList[n].pop_front();
             q.emplace(child);
             visited.push_back(child);
         }
-    }
-}
-
-int realBFS() {
-    int move = 0;
-
-    int from = visited.front();
-    visited.pop_front();
-
-    while (!visited.empty()) {
-        int to = visited.front();
-        visited.pop_front();
-        move += sp(from, to);
         from = to;
     }
-
     return move;
 }
 
-int sp(int from, int to) {
-    // todo : sp 배열을 저장해놓고 꺼내쓰기!!
-    //  -> memorization 통해서 시간복잡도 줄이기
-    int count = 1;
-    int depthFrom = depth[from];
-    int depthTo = depth[to];
-    bool isFromDeeper = depthFrom > depthTo;
-    int sub = abs(depthFrom - depthTo);
-    for (int i = 0; i < sub; i++) {
-        if (isFromDeeper) from = parent[from];
-        else to = parent[to];
-    }
-
-    if (from == to) {
-        return sub;
-    }
-
-    while (from > 1) {
-        if (parent[from] == parent[to]) {
-            break;
+void setParent() {
+    for (int i = 1; i <= 20; i++) {
+        for (int j = 0; j < N; j++) {
+            parent[j][i] = parent[parent[j][i - 1]][i - 1];
         }
-        from = parent[from];
-        to = parent[to];
-        count++;
+    }
+}
+
+int LCA(int from, int to) {
+    if (depth[from] < depth[to])
+        swap(from, to);
+
+    for (int i = 19; i >= 0; i--) {
+        if ((depth[from] - depth[to]) >= (1 << i))
+            from = parent[from][i];
     }
 
-    // cout << count * 2 + sub;
-    return count * 2 + sub;
+    if (from == to)
+        return from;
+
+    for (int i = 0; i <= 19; i++) {
+        if (parent[from][i] != parent[to][i]) {
+            from = parent[from][i];
+            to = parent[to][i];
+        }
+    }
+    return parent[from][0];
 }
