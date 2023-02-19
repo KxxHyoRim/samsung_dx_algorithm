@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include<iostream>
+
 using namespace std;
 
 extern void bfs_init(int N, int map[10][10]);
@@ -29,7 +30,7 @@ static int test_bfs() {
         int result = bfs(x1, y1, x2, y2);
         int dist;
         scanf("%d", &dist);
-        cout << result << " /" << dist << endl;
+        //cout << result << " /" << dist << endl;
         if (result != dist) score = 0;
     }
     return score;
@@ -43,7 +44,30 @@ int main() {
     return 0;
 }
 
-#include <queue>
+struct Point {
+    int x;
+    int y;
+};
+
+struct Queue {
+    Point data[100];
+    int head;
+    int tail;
+
+    Queue() : head(0), tail(0) {}
+
+    void push(Point point) {
+        data[tail++] = point;
+    }
+
+    Point pop() {
+        return data[head++];
+    }
+
+    bool empty() {
+        return head == tail;
+    }
+};
 
 int m[10][10]; // (0,0)이 기준
 bool visited[10][10]; // (0,0)이 기준
@@ -84,27 +108,27 @@ int bfs(int x1, int y1, int x2, int y2) {
     int tx = x2 - 1;
     int ty = y2 - 1;
 
-    queue<pair<int, int>> q;
-    q.emplace(fx, fy);
+    Queue q;
+    q.push({fx, fy});
     visited[fy][fx] = true;
 
     while (!q.empty()) {
-        int x = q.front().first;
-        int y = q.front().second;
-        q.pop();
-        if (x == tx && y == ty){
+        Point point = q.pop();
+        int x = point.x;
+        int y = point.y;
+        if (x == tx && y == ty) {
             break;
         }
 
-        for(int i = 0 ; i< 4; i++){
+        for (int i = 0; i < 4; i++) {
             int nx = x + dx[i];
             int ny = y + dy[i];
             if (!visited[ny][nx] && isInMap(nx, ny) && m[ny][nx] == 0) {
-                q.emplace(nx,ny);
+                q.push({nx, ny});
                 len[ny][nx] = len[y][x] + 1;
                 visited[ny][nx] = true;
             }
         }
     }
-    return (len[ty][tx] == 0)? -1 : len[ty][tx];
+    return (len[ty][tx] == 0) ? -1 : len[ty][tx];
 }
