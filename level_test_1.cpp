@@ -6,28 +6,13 @@ using namespace std;
 
 
 int solution(vector<int> nums){
-    int totalN= nums.size();
+    int totalN= (int) nums.size();
     int chooseN = totalN/2;
-
-    vector<bool> tmp(nums.size(), true);
-    for(int i = 0 ; i < chooseN; i++){
-        tmp[i] = false;
+    set<int> distinct;
+    for(int & num : nums){
+        distinct.emplace(num);
     }
-
-    set<int> pokemon;
-    int answer = 0;
-
-    do {
-        for(int i = 0 ; i < totalN; i++ ){
-            if (tmp[i])
-                pokemon.emplace(nums[i]);
-        }
-        if (pokemon.size() > answer)
-            answer = (int) pokemon.size();
-        pokemon.clear();
-    }while(next_permutation(tmp.begin(), tmp.end()));
-
-    return answer;
+    return (distinct.size() > chooseN)? (int) chooseN : (int) distinct.size();
 }
 
 
