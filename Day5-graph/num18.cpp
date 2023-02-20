@@ -4,6 +4,9 @@
 
 #include <stdio.h>
 
+#include <iostream>
+using namespace std;
+
 static unsigned int seed = 12345;
 
 static unsigned int pseudo_rand(int max) {
@@ -85,6 +88,7 @@ int main() {
             ret = dfs(k);
 
             scanf("%d", &correct);
+            //cout << "king : " << k <<" /ret : " << ret << " /correct : " << correct << endl;
 
             if (ret != correct)
                 score = 0;
@@ -102,12 +106,18 @@ using namespace std;
 
 int childList[100][5];
 int childSize[100];
-bool visited[100];
-int king;
+int top;
 
 void dfs_init(int N, int path[100][2]) {
-    fill(childSize, childSize+100, 0);
-    fill(visited, visited+100, 0);
+
+    // reset memory
+    for (auto & i : childList) {
+        for (int &j: i) { j = 0; }
+    }
+    for(int i = 0 ; i < 100; i++){
+        childSize[i] = 0;
+    }
+
 
     for (int i = 0; i < N-1; i++) {
         int parent = path[i][0];
@@ -118,27 +128,26 @@ void dfs_init(int N, int path[100][2]) {
     }
 }
 
-int traverse(int n) {
-    visited[n] = true;
-    if (n > king) {
-        return n;
-    } else if (childSize[n]){
-        return -1;
-    }
+int dfs(int n) {
+    int stack[100];
+    bool visited[101] = {false};
+    top = -1;
+    stack[++top] = n;
+    while(top != -1){
+        int curr = stack[top--];
+        if (!visited[curr]){
+            visited[curr] = true;
+            if (curr > n) {
+                return curr;
+            }
 
-    for (int node : childList[n]) {
-        if (!visited[node]){
-            int nextKing = traverse(node);
-            if (nextKing > king) return nextKing;
-
+            for (int next = childSize[curr] - 1; next >= 0; next--){
+                int child = childList[curr][next];
+                if(!visited[child]){
+                    stack[++top] = child;
+                }
+            }
         }
     }
     return -1;
-}
-
-int dfs(int n) {
-    fill(visited, visited + 100, 0);
-    king = n;
-    int result = traverse(n);
-    return result;
 }
